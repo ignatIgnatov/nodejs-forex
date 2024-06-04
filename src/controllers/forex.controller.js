@@ -1,5 +1,7 @@
 import { createError } from "../utils/error.js";
 import axios from "axios";
+import isCurrencyCode from 'currency-code-validator';
+import validator from "validator";
 
 const API_KEY = process.env.API_ACCESS_KEY;
 const API_RATES_URL = `https://open.er-api.com/v6/latest`;
@@ -24,6 +26,14 @@ export const convertCurrency = async (req, res, next) => {
 
     if (!from || !to || !amount) {
         next(createError(400, 'Missing query parameters'))
+    }
+
+    if (!isCurrencyCode(from) || !isCurrencyCode(to)) {
+        next(createError(400, 'Incorrect currency code'))
+    }
+
+    if (!validator.isFloat(amount) || amount < 0) {
+        next(createError(400, 'Incorrect currency amount'))
     }
 
     try {
