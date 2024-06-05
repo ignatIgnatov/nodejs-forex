@@ -42,3 +42,8 @@ You would need the following tools installed before running the project locally:
 
    - Go to http://localhost:8081/rates to see the fetched exchange rates.
    - Go to http://localhost:8081/convert?from=USD&to=BGN&amount=10 to convert ten dollars to bulgarian lev. Try with other currencies and values.
+7. To start the tests run the following:
+   
+   ```
+   npm test
+   ```
