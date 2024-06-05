@@ -108,7 +108,7 @@ describe('Forex Controller', () => {
 
             await convertCurrency(req, res, next);
 
-            expect(axios.get).toHaveBeenCalledWith(`https://v6.exchangerate-api.com/v6/undefined/pair/USD/EUR/100`);
+            expect(axios.get).toHaveBeenCalledWith(`${API_CONVERSION_URL}/USD/EUR/100`);
             expect(res.json).not.toHaveBeenCalled();
             expect(next).toHaveBeenCalledWith(createError(400, 'Failed to convert currency'));
         });
