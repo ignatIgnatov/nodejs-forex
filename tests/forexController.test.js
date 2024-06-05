@@ -8,9 +8,8 @@ jest.mock('axios');
 jest.mock('currency-code-validator');
 jest.mock('validator');
 
-const API_KEY = process.env.API_ACCESS_KEY;
-const API_RATES_URL = `https://open.er-api.com/v6/latest`;
-const API_CONVERSION_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/pair`
+const API_RATES_URL = 'https://open.er-api.com/v6/latest';
+const API_CONVERSION_URL = 'https://v6.exchangerate-api.com/v6/undefined/pair';
 
 describe('Forex Controller', () => {
     let req, res, next;
@@ -26,7 +25,7 @@ describe('Forex Controller', () => {
 
 
     describe('fetchExchangeRates', () => {
-        it('should return exchange rates data on success', async () => {
+        it('should return exchange rates successfully', async () => {
             const data = { rates: { USD: 1.2, EUR: 1.1 } };
             axios.get.mockResolvedValue({ data });
 
@@ -60,7 +59,7 @@ describe('Forex Controller', () => {
 
             await convertCurrency(req, res, next);
 
-            expect(axios.get).toHaveBeenCalledWith(`https://v6.exchangerate-api.com/v6/undefined/pair/USD/EUR/100`);
+            expect(axios.get).toHaveBeenCalledWith(`${API_CONVERSION_URL}/USD/EUR/100`);
             expect(res.json).toHaveBeenCalledWith(data);
             expect(next).not.toHaveBeenCalled();
         });
@@ -70,7 +69,7 @@ describe('Forex Controller', () => {
 
             await convertCurrency(req, res, next);
 
-            expect(axios.get).toHaveBeenCalledWith(`https://v6.exchangerate-api.com/v6/undefined/pair/USD/EUR/100`);
+            expect(axios.get).toHaveBeenCalledWith(`${API_CONVERSION_URL}/USD/EUR/100`);
             expect(next).toHaveBeenCalledWith(createError(400, 'Missing query parameters'));
         });
 
@@ -80,7 +79,7 @@ describe('Forex Controller', () => {
 
             await convertCurrency(req, res, next);
 
-            expect(axios.get).toHaveBeenCalledWith(`https://v6.exchangerate-api.com/v6/undefined/pair/USD/abc/100`);
+            expect(axios.get).toHaveBeenCalledWith(`${API_CONVERSION_URL}/USD/abc/100`);
             expect(next).toHaveBeenCalledWith(createError(400, 'Incorrect currency code'));
         });
 
@@ -91,7 +90,7 @@ describe('Forex Controller', () => {
 
             await convertCurrency(req, res, next);
 
-            expect(axios.get).toHaveBeenCalledWith(`https://v6.exchangerate-api.com/v6/undefined/pair/USD/EUR/abc`);
+            expect(axios.get).toHaveBeenCalledWith(`${API_CONVERSION_URL}/USD/EUR/abc`);
             expect(next).toHaveBeenCalledWith(createError(400, 'Incorrect currency amount'));
         });
 
@@ -102,7 +101,7 @@ describe('Forex Controller', () => {
 
             await convertCurrency(req, res, next);
 
-            expect(axios.get).toHaveBeenCalledWith(`https://v6.exchangerate-api.com/v6/undefined/pair/USD/EUR/-5`);
+            expect(axios.get).toHaveBeenCalledWith(`${API_CONVERSION_URL}/USD/EUR/-5`);
             expect(next).toHaveBeenCalledWith(createError(400, 'Incorrect currency amount'));
         });
 
@@ -113,7 +112,7 @@ describe('Forex Controller', () => {
 
             await convertCurrency(req, res, next);
 
-            expect(axios.get).toHaveBeenCalledWith(`https://v6.exchangerate-api.com/v6/undefined/pair/USD/EUR/1.234`);
+            expect(axios.get).toHaveBeenCalledWith(`${API_CONVERSION_URL}/USD/EUR/1.234`);
             expect(next).toHaveBeenCalledWith(createError(400, 'Incorrect currency amount'));
         });
 
