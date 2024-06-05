@@ -1,12 +1,8 @@
 import axios from 'axios';
 import { fetchExchangeRates, convertCurrency } from '../src/controllers/forex.controller';
 import { createError } from '../src/utils/error';
-import isCurrencyCode from 'currency-code-validator';
-import validator from 'validator';
 
 jest.mock('axios');
-jest.mock('currency-code-validator');
-jest.mock('validator');
 
 const API_RATES_URL = 'https://open.er-api.com/v6/latest';
 const API_CONVERSION_URL = 'https://v6.exchangerate-api.com/v6/undefined/pair';
@@ -18,7 +14,6 @@ describe('Forex Controller', () => {
         req = { query: {} };
         res = {
             json: jest.fn(),
-            send: jest.fn(),
         };
         next = jest.fn();
     });
@@ -36,7 +31,7 @@ describe('Forex Controller', () => {
             expect(next).not.toHaveBeenCalled();
         });
 
-        it('should call next with error on failure', async () => {
+        it('should call next with error on failure to connect to rates api', async () => {
             axios.get.mockRejectedValue(new Error('Network Error'));
 
             await fetchExchangeRates(req, res, next);
@@ -50,9 +45,6 @@ describe('Forex Controller', () => {
     describe('convertCurrency', () => {
         it('should return converted currency data successfully', async () => {
             req.query = { from: 'USD', to: 'EUR', amount: '100' };
-            isCurrencyCode.mockReturnValue(true);
-            validator.isFloat.mockReturnValue(true);
-            validator.isCurrency.mockReturnValue(true);
 
             const data = { result: 84 };
             axios.get.mockResolvedValue({ data });
@@ -75,7 +67,6 @@ describe('Forex Controller', () => {
 
         it('should call next with error when currency code is incorrect', async () => {
             req.query = { from: 'USD', to: 'abc', amount: '100' };
-            isCurrencyCode.mockReturnValue(false);
 
             await convertCurrency(req, res, next);
 
@@ -85,8 +76,6 @@ describe('Forex Controller', () => {
 
         it('should call next with error when amount is not a number', async () => {
             req.query = { from: 'USD', to: 'EUR', amount: 'abc' };
-            isCurrencyCode.mockReturnValue(true);
-            validator.isFloat.mockReturnValue(false);
 
             await convertCurrency(req, res, next);
 
@@ -96,8 +85,6 @@ describe('Forex Controller', () => {
 
         it('should call next with error when amount is negative number', async () => {
             req.query = { from: 'USD', to: 'EUR', amount: '-5' };
-            isCurrencyCode.mockReturnValue(true);
-            validator.isFloat.mockReturnValue(false);
 
             await convertCurrency(req, res, next);
 
@@ -107,8 +94,6 @@ describe('Forex Controller', () => {
 
         it('should call next with error when amount is floating number with more than two decimal places', async () => {
             req.query = { from: 'USD', to: 'EUR', amount: '1.234' };
-            isCurrencyCode.mockReturnValue(true);
-            validator.isFloat.mockReturnValue(false);
 
             await convertCurrency(req, res, next);
 
@@ -118,9 +103,6 @@ describe('Forex Controller', () => {
 
         it('should call next with error on conversion failure', async () => {
             req.query = { from: 'USD', to: 'EUR', amount: '100' };
-            isCurrencyCode.mockReturnValue(true);
-            validator.isFloat.mockReturnValue(true);
-            validator.isCurrency.mockReturnValue(true);
 
             axios.get.mockRejectedValue(new Error('Network Error'));
 
