@@ -32,7 +32,7 @@ export const convertCurrency = async (req, res, next) => {
         next(createError(400, 'Incorrect currency code'))
     }
 
-    if (!validator.isFloat(amount) || amount < 0) {
+    if (!validator.isFloat(amount, { min: 0, max: Infinity }) || !validator.isCurrency(amount)) {
         next(createError(400, 'Incorrect currency amount'))
     }
 
