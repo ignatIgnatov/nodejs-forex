@@ -36,7 +36,7 @@ You would need the following tools installed before running the project locally:
 5. Start the server:
 
    ```
-   node --env-file=.env index.js
+   node index.js
    ```
 6. Access the application:
 
